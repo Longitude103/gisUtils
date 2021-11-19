@@ -8,19 +8,21 @@ import (
 // InverseDW is a function that takes in a slice of values and returns the weighted
 // 		distribution of each value in a slice of the same length.
 //		This is also protected with a division by zero or negative with and error return
+// This function uses the "Shepard's" method to determine the values and is a simple appoach. It uses the
+// exponent value of p = 2 which is the defacto standard of this equation. Reference: https://en.wikipedia.org/wiki/Inverse_distance_weighting
 func InverseDW(dist []float64) ([]float64, error) {
 	totalDist := 0.0
 	for _, v := range dist {
-		totalDist += v
+		totalDist += math.Pow(v, -2)
 	}
 
 	var weightResult []float64
 	if totalDist > 0 {
 		for _, v := range dist {
-			weightResult = append(weightResult, 1-(v/totalDist))
+			weightResult = append(weightResult, math.Pow(v, -2)/totalDist)
 		}
 	} else {
-		return nil, errors.New("Division by zero or negative")
+		return nil, errors.New("division by zero or negative")
 	}
 
 	finalResult := normalize(weightResult)
